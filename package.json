@@ -14,6 +14,7 @@
     "hardhat": "^2.22.2"
   },
   "dependencies": {
-    "bn.js": "^5.2.1"
+    "bn.js": "^5.2.1",
+    "ethers": "^6.11.1"
   }
 }

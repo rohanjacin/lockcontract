@@ -23,14 +23,19 @@ contract Lock {
   uint256 public constant BB = 7;
   uint256 public constant PP = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F;
 
-  constructor (string memory _name) {
+  constructor (string memory _name, uint256 _x) {
     name = _name;
     console.log("name:", name);
+    console.log("x:", _x);
+    genPub(_x);
   } 
 
   function genPub(uint256 privKey) public pure returns(uint256 qx, uint256 qy) {
     (qx, qy) = EllipticCurve.ecMul(
       privKey, GX, GY, AA, PP
       );
+
+    console.log("qx:", qx);
+    console.log("qy:", qy);
   }
 }
