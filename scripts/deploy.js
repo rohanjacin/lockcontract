@@ -7,8 +7,9 @@ async function main() {
 	const samplelock = await Lock.deploy('samplelock', lock_priv);
 
 	console.log("samplelock:" + JSON.stringify(samplelock));
-	//await samplelock.deployed();
+	await samplelock.waitForDeployment();
 
+	samplelock.session();
 	console.log(`Deployed to ${samplelock.address}`);
 }
 

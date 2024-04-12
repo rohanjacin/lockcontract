@@ -12,6 +12,7 @@ pragma solidity ^0.8.0;
 
 //elliptic-curve-solidity/contracts/
 import "./EllipticCurve.sol";
+import "./handshake.sol";
 import "hardhat/console.sol";
 
 contract Lock {
@@ -37,5 +38,10 @@ contract Lock {
 
     console.log("qx:", qx);
     console.log("qy:", qy);
+  }
+
+  function session () public view {
+    console.log("new session started (server)..");
+    Handshake.session();
   }
 }
