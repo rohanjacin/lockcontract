@@ -16,7 +16,7 @@ import "./seed.sol";
 
 library Nonce {
 
-	function session () internal pure returns (uint256) {
+	function session () internal view returns (uint256) {
 		uint lcs;
 		uint ts;
 		uint ct;

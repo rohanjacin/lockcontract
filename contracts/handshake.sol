@@ -14,7 +14,7 @@ import "./nonce.sol";
 
 library Handshake {
 
-	function session () internal pure returns (uint256) {
+	function session () internal view returns (uint256) {
 		uint start;
 		uint end;
 		uint counter;
