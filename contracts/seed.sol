@@ -19,23 +19,25 @@ import "./EllipticCurve.sol";
 
 library Seed {
 
-	function session () internal view returns (uint256) {
+	function session () internal view returns (uint256, uint256) {
 		uint lcs;
 		uint ts;
 		uint ct;
 		uint256 seed;
 		uint256 salt;
-		uint256 pub;
+		uint256 pub_x;
+		uint256 pub_y;
 		uint256 priv;
 
 		console.log("new session started (seed)..");
-		(pub, priv) = genKeyPair();
-		console.log("pub:", pub);
+		(priv, pub_x, pub_y) = genKeyPair();
 		console.log("priv:", priv);
-		return 1;
+		console.log("pub_x:", pub_x);
+		console.log("pub_y:", pub_y);
+		return (pub_x, pub_y);
 	}
 
-	function genKeyPair () internal view returns (uint256, uint256) {
+	function genKeyPair () internal view returns (uint256, uint256, uint256) {
 		uint256 GX = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798;
 		uint256 GY = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8;
 		uint256 AA = 0;
@@ -47,11 +49,14 @@ library Seed {
 		uint256 k = RandomNumber.getNumber();
 		//console.log("Private key:", k);				
 
+	    k = EllipticCurve.expMod(k, 1, PP);
+		console.log("Private key(umod(n)):", k);				
+	    
 	    (qx, qy) = EllipticCurve.ecMul(
 	      k, GX, GY, AA, PP
 	      );
-	    //console.log("Public key:", qx);
-	    //console.log("qy:", qy);
-	    return (k, qx);
+	    console.log("qx:", qx);
+	    console.log("qy:", qy);
+	    return (k, qx, qy);
 	}
 }

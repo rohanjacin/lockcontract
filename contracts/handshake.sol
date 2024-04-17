@@ -14,7 +14,7 @@ import "./nonce.sol";
 
 library Handshake {
 
-	function session () internal view returns (uint256) {
+	function session () internal view returns (uint256, uint256) {
 		uint start;
 		uint end;
 		uint counter;
@@ -24,7 +24,14 @@ library Handshake {
 		uint256 lock_nonce;
 
 		console.log("new session started (handshake)..");
-		Nonce.session();
-		return 1;//nonce
+		return Nonce.session();
+	}
+
+	function sendRequest () internal view returns (string memory _type, 
+												   uint256 _pb_x, uint256 _pb_y) {
+		console.log("Send Request");
+		(_pb_x, _pb_y) = session();
+		_type = "Request";
+		return (_type, _pb_x, _pb_y);
 	}
 }

@@ -18,15 +18,13 @@ contract Lock {
 
   string name;
 
-  constructor (string memory _name, uint256 _x) {
+  constructor (string memory _name) {
     name = _name;
     console.log("name:", name);
-    console.log("x:", _x);
-    //genPub(_x);
   } 
 
-  function session () public view {
+  function session () public view returns (string memory, uint256, uint256){
     console.log("new session started (server)..");
-    Handshake.session();
+    return Handshake.sendRequest();
   }
 }

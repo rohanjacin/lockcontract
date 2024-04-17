@@ -16,7 +16,7 @@ import "./seed.sol";
 
 library Nonce {
 
-	function session () internal view returns (uint256) {
+	function session () internal view returns (uint256, uint256) {
 		uint lcs;
 		uint ts;
 		uint ct;
@@ -24,7 +24,6 @@ library Nonce {
 		uint256 salt;
 
 		console.log("new session started (nonce)..");
-		Seed.session();
-		return 1;
+		return Seed.session();
 	}
 }
