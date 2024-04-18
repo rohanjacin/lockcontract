@@ -6,17 +6,16 @@ class LockNetwork extends serverHandshake {
 	constructor() {
 		super();
 		this.samplelock = null;
+		this.Lock = null;
 		this.buildEventHandler();
 		console.log("Lock net init.");
 	}
 }
 
 LockNetwork.prototype.connect = async function () {
-	const Lock = await hre.ethers.getContractFactory('Lock');
 
-	this.samplelock = await Lock.deploy('samplelock');
-
-	console.log("samplelock:" + JSON.stringify(this.samplelock));
+	this.Lock = await hre.ethers.getContractFactory('Lock');
+	this.samplelock = await this.Lock.deploy('samplelock');
 	await this.samplelock.waitForDeployment();
 	console.log(`Deployed to ${this.samplelock.address}`);
 	this.session();
@@ -28,9 +27,18 @@ LockNetwork.prototype.buildEventHandler = async function () {
 		console.log("contract_event");
 		if (event == 'request') {
 			console.log("Starting the handshake");
-			let [type, pb_x, pb_y] = (await this.samplelock.session());		
+			this.request();
 		}
 	}.bind(this));
+}
+
+LockNetwork.prototype.request = async function () {
+	let [type, pb_x, pb_y] = (await this.samplelock.session());
+
+	if (type == 'Request') {
+		//Send the reuest to the lock
+		this.sendRequest(pb_x, pb_y);
+	}
 }
 
 var locknet = new LockNetwork();

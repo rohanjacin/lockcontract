@@ -1,6 +1,7 @@
 var BN = require('bn.js');
 var Frame = require('./socket/udp_server.js');
 var hsm = require('./hsm.js');
+const HSCurve = require('./hs_curve25519.js');
 const util = require('util');
 const EventEmitter = require('events');
 
@@ -68,7 +69,7 @@ ServerHandshake = function ServerHandshake () {
 
 util.inherits(ServerHandshake, EventEmitter);
 
-ServerHandshake.prototype.sendRequest = function () {
+ServerHandshake.prototype.sendRequest = function (pb_x, pb_y) {
   let now = new BN(Math.floor(Date.now()/1000), 16);
 
   if (this.isRefreshed(now) == false) {
@@ -80,12 +81,25 @@ ServerHandshake.prototype.sendRequest = function () {
 
   this.start = now;
   
-  let {Pb} = this.session.call();
-  console.log("Pb:" + Pb.toString());
+  //Convert from bigInt to BN
+  let Pb_x = new BN(pb_x);
+  let Pb_y = new BN(pb_y);
 
+  console.log(`Pb_x:` + Pb_x);
+  console.log(`Pb_y:` + Pb_y);
+
+  let curve = new HSCurve();
+  let Pb;
+
+  Pb = curve.createPointFromPublic('secp256k1', {x:Pb_x, y:Pb_y});
+  
+  console.log("Pb:" + Pb.toString());
+  Pb = Pb.getPublic('string');
+  Pb = new BN(Pb, 16);
   Pb = Pb.toBuffer(32);
+
   this.frame.sendFrame('Request', Pb);
-  this.postEvent('request');
+  //this.postEvent('request');
   return true;
 }
 
