@@ -9,6 +9,8 @@ const HS = {
   REFRESH_TIMEOUT: 30000
 }
 
+var server_hs;
+
 var ServerHandshake;
 (function() {
     var instance;
@@ -18,11 +20,16 @@ ServerHandshake = function ServerHandshake () {
         return instance;
 
   instance = this;
+  server_hs = this;
   EventEmitter.call(this);
+
+  this.machine = hsm.createMachine(SM);
+  this.state = this.machine.value;
 
   this.start = new BN();
   this.end = new BN();
   this.frame = new Frame();
+  this.buildStateEventHandler();
 
   let counter = new BN(0, 16);
   let counter_steps = new BN(1, 16);
@@ -62,7 +69,7 @@ ServerHandshake = function ServerHandshake () {
 
   this.isRefreshed = (n)=>{((n - this.start) > HS.REFRESH_TIMEOUT)? true:false };
   this.postEvent = (e)=>{process.nextTick(() => {this.emit('state_event', e);})};
-  this.postEventToContract = (e)=>{process.nextTick(() => {this.emit('contract_event', e);})};
+  this.postEventToContract = (e, data)=>{process.nextTick(() => {this.emit('contract_event', e, data);})};
 
 };
 }());
@@ -99,7 +106,7 @@ ServerHandshake.prototype.sendRequest = function (pb_x, pb_y) {
   Pb = Pb.toBuffer(32);
 
   this.frame.sendFrame('Request', Pb);
-  //this.postEvent('request');
+  this.postEvent('request');
   return true;
 }
 
@@ -126,15 +133,16 @@ ServerHandshake.prototype.solveChallenge = function () {
     return false;
   }
 
-  let nounce = this.lock_nounce;
-  let match = server_hs.solve.call(null, nounce);
+  this.postEventToContract("challenge", this.lock_nounce);
+  //let nounce = this.lock_nounce;
+  //let match = this.solve.call(null, nounce);
 
   //Send server challenge only if Pm matches
-  if (match == true) {
-    server_hs.postEvent('validated');
+/*  if (match == true) {
+    this.postEvent('validated');
   }
   else
-    server_hs.postEvent('idle');
+    this.postEvent('idle');*/
   return true;
 }
 
@@ -149,7 +157,7 @@ ServerHandshake.prototype.createChallenge = function () {
   }
 
   this.update.call();
-  server_hs.postEvent('send');
+  this.postEvent('send');
   return true;
 }
 
@@ -168,7 +176,27 @@ ServerHandshake.prototype.sendChallenge = function () {
   return true;
 }
 
-/*const machine = hsm.createMachine({
+ServerHandshake.prototype.buildStateEventHandler = function () {
+
+  this.on('state_event', function(event) {
+
+    this.state = this.machine.transition(this.state, event);
+  }.bind(this));
+
+  /*this.frame.on('request', function(data) {
+
+    this.postEvent('request');
+  }.bind(this));
+  */
+
+  this.frame.on('challenge', function(data) {
+
+    this.lock_nounce = data.nounce; //data.slice(0, 131);
+    this.postEvent('challenge');
+  }.bind(this));
+}
+
+const SM = {
 
   initialState: 'idle',
 
@@ -360,86 +388,6 @@ ServerHandshake.prototype.sendChallenge = function () {
     },
 
   }
-})
-
-const contractHSM = hsm.createMachine({
-
-  initialState: 'idle',
-
-  idle: {
-    actions: {
-      onEnter() {
-        //console.log('idle: onEnter')
-      },
-
-      onExit() {
-        //console.log('idle: onExit')
-      },
-
-    },
-
-    transitions: {
-      start: {
-        target: 'waitForRequest',
-        action() {
-          console.log('transition action for "waitForRequest" in "idle" state');
-        },
-      },
-    },
-  },
-
-  waitForRequest: {
-    actions: {
-      onEnter() {
-      },
-      onExit() {
-        //console.log('waiting: onExit')
-      },
-    },
-
-    transitions: {
-      request: {
-        target: 'idle',
-        action() {
-          console.log('transition action for "challenge" in "waiting" state')
-        },
-      },
-    },
-  },
-})
-*/
-//let state = machine.value
-
-/*server_hs.on('state_event', (event) => {
-
-  state = machine.transition(state, event);
-});
-
-server_hs.frame.on('request', (data) => {
-
-  server_hs.postEvent('request');
-});
-
-server_hs.frame.on('challenge', (data) => {
-
-  server_hs.lock_nounce = data.nounce; //data.slice(0, 131);
-  server_hs.postEvent('challenge');
-});
-*/
-
-/*async function start() {
-	console.log("Starting the handshake");
-	let [type, pb_x, pb_y] = (await samplelock.session());
-
-	//Convert from bigInt to BN
-	let Pb_x = new BN(pb_x);
-	let Pb_y = new BN(pb_y);
-
-	console.log(`Received frame:` + type);
-	console.log(`Pb_x:` + Pb_x);
-	console.log(`Pb_y:` + Pb_y);
-
-	//frame.sendFrame(type, Pb_x, Pb_x);
 }
-*/
+
 module.exports = ServerHandshake;

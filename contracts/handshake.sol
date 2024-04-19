@@ -14,23 +14,29 @@ import "./nonce.sol";
 
 library Handshake {
 
-	function session () internal view returns (uint256, uint256) {
-		uint start;
+	function session () internal view returns (uint256 _priv, string memory _type, uint256 _pb_x, uint256 _pb_y) {
+/*		uint start;
 		uint end;
 		uint counter;
 		uint counter_steps;
 		uint time;
 		uint256 nonce;
 		uint256 lock_nonce;
-
+*/
 		console.log("new session started (handshake)..");
-		return Nonce.session();
+		(_priv, _pb_x, _pb_y) = Nonce.session();
+		(_type, _pb_x, _pb_y) = sendRequest(_pb_x, _pb_y);
+		return (_priv, _type, _pb_x, _pb_y);
 	}
 
-	function sendRequest () internal view returns (string memory _type, 
-												   uint256 _pb_x, uint256 _pb_y) {
-		console.log("Send Request");
-		(_pb_x, _pb_y) = session();
+	function solve (uint256 _priv, ChallengeNonce calldata nonce) internal view returns (bool) {
+		return Nonce.solve(_priv, nonce);
+	}
+
+	function sendRequest (uint256 _pb_x, uint256 _pb_y) internal view returns
+						 (string memory _type, uint256, uint256) {
+		console.log("Send Request (_pb_x):", _pb_x);
+		console.log("Send Request (_pb_y):", _pb_y);
 		_type = "Request";
 		return (_type, _pb_x, _pb_y);
 	}
