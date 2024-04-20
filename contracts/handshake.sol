@@ -29,7 +29,9 @@ library Handshake {
 		return (_priv, _type, _pb_x, _pb_y);
 	}
 
-	function solve (uint256 _priv, ChallengeNonce calldata nonce) internal view returns (bool) {
+	function solve (uint256 _priv, ChallengeNonce calldata nonce)
+					internal returns (bool, AffinePoint memory,
+										   AffinePoint memory) {
 		return Nonce.solve(_priv, nonce);
 	}
 
@@ -39,5 +41,11 @@ library Handshake {
 		console.log("Send Request (_pb_y):", _pb_y);
 		_type = "Request";
 		return (_type, _pb_x, _pb_y);
+	}
+
+	function update (uint256 _priv, AffinePoint memory _pb,
+					 AffinePoint memory _pa, AffinePoint memory _pm)
+					 internal view returns (ChallengeNonce memory nonce) {
+		return Nonce.update(_priv, _pb, _pa, _pm);
 	}
 }

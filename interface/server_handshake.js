@@ -146,6 +146,22 @@ ServerHandshake.prototype.solveChallenge = function () {
   return true;
 }
 
+ServerHandshake.prototype.validate = function (matched) {
+  let now = new BN(Math.floor(Date.now()/1000), 16);
+
+  if (this.isRefreshed(now) == false) {
+
+    console.log("ServerHandshake FSM not refreshed");
+    this.postEvent('idle');
+    return false;
+  }
+
+  if (matched)
+    this.postEvent('validated');
+  else
+    this.postEvent('idle');
+}
+
 ServerHandshake.prototype.createChallenge = function () {
   let now = new BN(Math.floor(Date.now()/1000), 16);
 
@@ -156,12 +172,14 @@ ServerHandshake.prototype.createChallenge = function () {
     return false;
   }
 
-  this.update.call();
-  this.postEvent('send');
+  this.postEventToContract("response");
+
+  //this.update.call();
+  //this.postEvent('send');
   return true;
 }
 
-ServerHandshake.prototype.sendChallenge = function () {
+ServerHandshake.prototype.sendChallenge = function (nonce) {
   let now = new BN(Math.floor(Date.now()/1000), 16);
 
   if (this.isRefreshed(now) == false) {
@@ -171,7 +189,7 @@ ServerHandshake.prototype.sendChallenge = function () {
     return false;
   }
 
-  this.frame.sendFrame('Response', this.nounce);
+  this.frame.sendFrame('Response', nonce);
   this.postEvent('ack_pending');
   return true;
 }
@@ -308,7 +326,7 @@ const SM = {
         action() {
 
           console.log('transition action for "send" in "challenge" state')
-          server_hs.sendChallenge();
+          //server_hs.sendChallenge();
         },
 
       },

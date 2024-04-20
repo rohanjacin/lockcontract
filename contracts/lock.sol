@@ -19,8 +19,9 @@ contract Lock {
   string name;
   struct Session {
     uint256 priv;
-    uint256 pb_x;
-    uint256 pb_y;
+    AffinePoint pb;
+    AffinePoint pa;
+    AffinePoint pm;
     string ftype;
     bool matched;
   }
@@ -41,11 +42,13 @@ contract Lock {
     (_priv, _type, _Pb_x, _Pb_y) = Handshake.session();
 
     s.priv = _priv;
-    s.pb_x = _Pb_x;
-    s.pb_y = _Pb_y;
+    s.pb.x = _Pb_x;
+    s.pb.y = _Pb_y;
     s.ftype = _type;
+/*    s.matched = false;
+    s.pa = (0, 0);
+    s.pm = (0, 0);*/
     sessions[msg.sender] = s;
-    //locks.push(msg.sender);
 
     return (_type, _Pb_x, _Pb_y);
   }
@@ -53,18 +56,44 @@ contract Lock {
   function getSession() public view returns (string memory _type, uint256 _Pb_x, uint256 _Pb_y) {
     
     Session memory sp = sessions[msg.sender];
-    return (sp.ftype, sp.pb_x, sp.pb_y);
+    return (sp.ftype, sp.pb.x, sp.pb.y);
   }
 
-  function solve (ChallengeNonce calldata nonce) public view returns (bool){
-    console.log("challege to solve (server):", msg.sender);
-
+  function solve (ChallengeNonce calldata nonce)
+                  public returns (bool) {
     Session memory sp = sessions[msg.sender];
 
-    //ChallengeNonce storage nc = challenge[1];
-    sp.matched = Handshake.solve(sp.priv, nonce);
+    console.log("challege to solve (server):", msg.sender);
+    console.log("solve:", msg.sender);
 
-    //locks.pop();
-    return true;
+    (sp.matched, sp.pm, sp.pa) = Handshake.solve(sp.priv, nonce);
+    sessions[msg.sender] = sp;
+    console.log("s.matched:", sp.matched);
+    return sp.matched;
+  }
+
+  function getSolved () public view returns (bool matched) {
+    
+    Session memory s = sessions[msg.sender];
+    console.log("getSolved:", msg.sender);
+    console.log("s.matched:", s.matched);
+    return (s.matched);
+  }
+
+  function update () public view returns (ChallengeNonce memory nonce) {
+
+    ChallengeNonce memory test; 
+    console.log("Update", msg.sender);    
+    Session memory s = sessions[msg.sender];
+/*    console.log("s.ftype:", s.ftype);
+    console.log("s.priv:", s.priv);
+    console.log("s.pb.x:", s.pb.x);
+    console.log("s.pb.y:", s.pb.y);
+    console.log("s.pm.x:", s.pm.x);
+    console.log("s.pm.y:", s.pm.y);
+    console.log("s.pa.x:", s.pa.x);
+    console.log("s.pa.y:", s.pa.y);
+*/
+    return Handshake.update(s.priv, s.pb, s.pa, s.pm);
   }
 }

@@ -20,6 +20,7 @@ struct ChallengeNonce {
 	bytes nonce1; //32
 	bytes seed; //65
 	bytes counter; //1
+	bytes hmac; //32
 }
 
 library Nonce {
@@ -35,12 +36,16 @@ library Nonce {
 		return Seed.session();
 	}
 
-	function solve (uint256 _priv, ChallengeNonce calldata nonce) internal view returns (bool) {
+	function solve (uint256 _priv, ChallengeNonce calldata nonce)
+					internal returns (bool, AffinePoint memory,
+										   AffinePoint memory) {
 		console.log("Solving Nonce..");
 		return solveNonce(_priv, nonce);
 	}
 
-	function solveNonce (uint256 _priv, ChallengeNonce calldata nonce) internal view returns (bool) {
+	function solveNonce (uint256 _priv, ChallengeNonce calldata nonce) 
+						 internal returns (bool, AffinePoint memory,
+						 						AffinePoint memory) {
 		AffinePoint memory Pa;
 		AffinePoint memory Pm;
 
@@ -48,8 +53,29 @@ library Nonce {
 		console.log("Pa(x):", Pa.x);
 		console.log("Pa(y):", Pa.y);
 		Pm = Seed.retrieveSeed(_priv, Pa, nonce.seed);
-		return true;
+		return (true, Pm, Pa);
 	}
 
+	function update (uint256 _priv, AffinePoint memory _pb,
+					 AffinePoint memory _pa, AffinePoint memory _pm)
+					 internal view returns (ChallengeNonce memory nonce) {
+		//bytes memory n = new bytes(32);
+		//bytes memory ct = new bytes(1);
+		//bytes memory n = new bytes(32);
 
+		nonce.nonce0 = Point.encodePointFromCipher(_pb);
+		//nonce.nonce1 = keccak256(abi.encodePacked(h.concat(ct, lcs)));
+		nonce.nonce1 = new bytes(32);
+		nonce.seed = Seed.genSeed(_priv, _pb, _pa, _pm);
+		nonce.counter = new bytes(1);
+		nonce.hmac = new bytes(32);
+
+		console.log("nonce.nonce0(len):", nonce.nonce0.length);
+		console.log("nonce.nonce1(len):", nonce.nonce1.length);
+		console.log("nonce.seed(len):", nonce.seed.length);
+		console.log("nonce.counter(len):", nonce.counter.length);
+		console.log("nonce.hmac(len):", nonce.hmac.length);
+
+		return nonce;
+	}
 }

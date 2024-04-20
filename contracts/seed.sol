@@ -31,14 +31,14 @@ library Seed {
 		uint256 priv;
 
 		console.log("new session started (seed)..");
-		(priv, pub_x, pub_y) = genSeed();
+		(priv, pub_x, pub_y) = genRPV();
 		console.log("priv:", priv);
 		console.log("pub_x:", pub_x);
 		console.log("pub_y:", pub_y);
 		return (priv, pub_x, pub_y);
 	}
 
-	function genSeed () internal view returns (uint256, uint256, uint256) {
+	function genRPV () internal view returns (uint256, uint256, uint256) {
 
 		uint256 k = RandomNumber.getNumber();
 		console.log("Private key:", k);				
@@ -46,7 +46,7 @@ library Seed {
 	    return Point.genKeyPair(k);
 	}
 
-	function retrieveSeed (uint256 _priv, AffinePoint memory _Pa, bytes calldata _seed) internal view returns (AffinePoint memory Pm) {
+	function retrieveSeed (uint256 _priv, AffinePoint memory _Pa, bytes calldata _seed) internal returns (AffinePoint memory Pm) {
 		AffinePoint memory CipherPt_2;
 		AffinePoint memory SharedPt;
 
@@ -78,6 +78,36 @@ library Seed {
 								Point.AA, Point.BB, Point.PP)) {
 		}
 
+		return Pm;
+	}
 
+	function genSeed (uint256 _priv, AffinePoint memory _Pb,
+					  AffinePoint memory _Pa, AffinePoint memory _Pm)
+					  internal view returns (bytes memory) {
+		AffinePoint memory CipherPt_1;
+		AffinePoint memory CipherPt_2;
+
+		CipherPt_1 = _Pb;
+		CipherPt_2 = _Pa;
+
+		console.log("genSeed..");
+		console.log("_Pm(x):", _Pm.x);
+		console.log("_Pm(y):", _Pm.y);
+
+		(CipherPt_2.x, CipherPt_2.y) = EllipticCurve.ecMul(_priv, CipherPt_2.x, CipherPt_2.y,
+							Point.AA, Point.PP);
+
+		(CipherPt_2.x, CipherPt_2.y) = EllipticCurve.ecAdd(CipherPt_2.x, CipherPt_2.y,
+							_Pm.x, _Pm.y, Point.AA, Point.PP);
+	
+		console.log("CipherPt_2(x):", CipherPt_2.x);
+		console.log("CipherPt_2(y):", CipherPt_2.y);
+
+		if (true == EllipticCurve.isOnCurve(CipherPt_2.x, CipherPt_2.y,
+								Point.AA, Point.BB, Point.PP)) {
+			console.log("CipherPt2 is on the curve");
+		}
+
+		return Point.encodePointFromCipher(CipherPt_2);
 	}
 }

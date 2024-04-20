@@ -46,6 +46,22 @@ library Point {
 		}
 	}
 
+	function encode (bytes32 _x, bytes32 _y) internal pure returns (bytes memory key) {
+		//bytes memory a = new bytes(65);
+		//a[0] = 0x04;
+		bytes memory a = hex"04";
+
+		console.log("Encoding Point..");
+		console.log("x:", uint256(_x));
+		console.log("y:", uint256(_y));
+
+		// uncompressed, hybrid-odd, hybrid-even	
+		key = bytes.concat(abi.encodePacked(a), abi.encodePacked(_x), abi.encodePacked(_y));
+
+		console.log("key(length):", key.length);
+		return key;
+	}
+
 	function genKeyPair (uint256 k) internal view returns (uint256, uint256, uint256) {
 		uint256 qx;
 		uint256 qy;
@@ -73,4 +89,14 @@ library Point {
 			return _P;
 		}
 	}
+
+	function encodePointFromCipher (AffinePoint memory _P) internal view returns (bytes memory key) {		
+		bytes32 _xx = bytes32(_P.x);
+		bytes32 _yy = bytes32(_P.y);
+
+		if (true == EllipticCurve.isOnCurve(_P.x, _P.y, AA, BB, PP)) {
+		}
+			
+		return encode(_xx, _yy);
+	}	
 }
