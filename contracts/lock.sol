@@ -27,7 +27,6 @@ contract Lock {
   }
 
   mapping (address => Session) sessions;
-  //address[] public locks;
 
   constructor (string memory _name) {
     name = _name;
@@ -45,9 +44,6 @@ contract Lock {
     s.pb.x = _Pb_x;
     s.pb.y = _Pb_y;
     s.ftype = _type;
-/*    s.matched = false;
-    s.pa = (0, 0);
-    s.pm = (0, 0);*/
     sessions[msg.sender] = s;
 
     return (_type, _Pb_x, _Pb_y);
@@ -64,7 +60,6 @@ contract Lock {
     Session memory sp = sessions[msg.sender];
 
     console.log("challege to solve (server):", msg.sender);
-    console.log("solve:", msg.sender);
 
     (sp.matched, sp.pm, sp.pa) = Handshake.solve(sp.priv, nonce);
     sessions[msg.sender] = sp;
@@ -82,18 +77,9 @@ contract Lock {
 
   function update () public view returns (ChallengeNonce memory nonce) {
 
-    ChallengeNonce memory test; 
     console.log("Update", msg.sender);    
     Session memory s = sessions[msg.sender];
-/*    console.log("s.ftype:", s.ftype);
-    console.log("s.priv:", s.priv);
-    console.log("s.pb.x:", s.pb.x);
-    console.log("s.pb.y:", s.pb.y);
-    console.log("s.pm.x:", s.pm.x);
-    console.log("s.pm.y:", s.pm.y);
-    console.log("s.pa.x:", s.pa.x);
-    console.log("s.pa.y:", s.pa.y);
-*/
+
     return Handshake.update(s.priv, s.pb, s.pa, s.pm);
   }
 }

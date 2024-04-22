@@ -46,7 +46,7 @@ library Seed {
 	    return Point.genKeyPair(k);
 	}
 
-	function retrieveSeed (uint256 _priv, AffinePoint memory _Pa, bytes calldata _seed) internal returns (AffinePoint memory Pm) {
+	function retrieveSeed (uint256 _priv, AffinePoint memory _Pa, bytes calldata _seed) internal pure returns (AffinePoint memory Pm) {
 		AffinePoint memory CipherPt_2;
 		AffinePoint memory SharedPt;
 
@@ -83,7 +83,7 @@ library Seed {
 
 	function genSeed (uint256 _priv, AffinePoint memory _Pb,
 					  AffinePoint memory _Pa, AffinePoint memory _Pm)
-					  internal view returns (bytes memory) {
+					  internal pure returns (bytes memory) {
 		AffinePoint memory CipherPt_1;
 		AffinePoint memory CipherPt_2;
 

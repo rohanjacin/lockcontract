@@ -47,8 +47,6 @@ library Point {
 	}
 
 	function encode (bytes32 _x, bytes32 _y) internal pure returns (bytes memory key) {
-		//bytes memory a = new bytes(65);
-		//a[0] = 0x04;
 		bytes memory a = hex"04";
 
 		console.log("Encoding Point..");
@@ -62,7 +60,7 @@ library Point {
 		return key;
 	}
 
-	function genKeyPair (uint256 k) internal view returns (uint256, uint256, uint256) {
+	function genKeyPair (uint256 k) internal pure returns (uint256, uint256, uint256) {
 		uint256 qx;
 		uint256 qy;
 
@@ -77,7 +75,7 @@ library Point {
 	    return (k, qx, qy);
 	}
 
-	function createPointFromPublic (bytes calldata key) internal view returns (AffinePoint memory _P) {		
+	function createPointFromPublic (bytes calldata key) internal pure returns (AffinePoint memory _P) {		
 		bytes32 _xx;
 		bytes32 _yy;
 			
@@ -90,7 +88,7 @@ library Point {
 		}
 	}
 
-	function encodePointFromCipher (AffinePoint memory _P) internal view returns (bytes memory key) {		
+	function encodePointFromCipher (AffinePoint memory _P) internal pure returns (bytes memory key) {		
 		bytes32 _xx = bytes32(_P.x);
 		bytes32 _yy = bytes32(_P.y);
 

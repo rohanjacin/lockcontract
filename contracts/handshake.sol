@@ -30,15 +30,13 @@ library Handshake {
 	}
 
 	function solve (uint256 _priv, ChallengeNonce calldata nonce)
-					internal returns (bool, AffinePoint memory,
+					internal pure returns (bool, AffinePoint memory,
 										   AffinePoint memory) {
 		return Nonce.solve(_priv, nonce);
 	}
 
-	function sendRequest (uint256 _pb_x, uint256 _pb_y) internal view returns
+	function sendRequest (uint256 _pb_x, uint256 _pb_y) internal pure returns
 						 (string memory _type, uint256, uint256) {
-		console.log("Send Request (_pb_x):", _pb_x);
-		console.log("Send Request (_pb_y):", _pb_y);
 		_type = "Request";
 		return (_type, _pb_x, _pb_y);
 	}

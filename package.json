@@ -15,8 +15,6 @@
   },
   "dependencies": {
     "bn.js": "^5.2.1",
-    "elliptic": "^6.5.5",
-    "ethers": "^6.11.1",
-    "web3": "^4.8.0"
+    "elliptic": "^6.5.5"
   }
 }

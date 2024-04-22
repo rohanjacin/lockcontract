@@ -82,32 +82,23 @@ LockNetwork.prototype.response = async function () {
 	console.log("Fetch response (challenge)");
 	let response = await this.samplelock.update();
 
-/*	console.log("response typeof:" + typeof(response));
-	console.log("response[0] typeof:" + typeof(response[0]));
-	console.log("response[1] typeof:" + typeof(response[1]));
-	console.log("response[2] typeof:" + typeof(response[2]));
-	console.log("response[3] typeof:" + typeof(response[3]));
-	console.log("response[4] typeof:" + typeof(response[4]));
-	console.log("Response[0]:" + response[0]);
-*/
-	console.log("Response is:" + JSON.stringify(response));
-	nonce0 = new BN(response[0], 16).toBuffer(65);
-	nonce1 = new BN(response[1], 16).toBuffer(32);
-	seed = new BN(response[2], 16).toBuffer(65);
-	counter = new BN(response[3], 16).toBuffer(1);
-	hmac = new BN(response[4], 16).toBuffer(32);
+	nonce0 = response[0].split("0x");
+	nonce1 = response[1].split("0x");
+	seed = response[2].split("0x");
+	counter = response[3].split("0x");
+	hmac = response[4].split("0x");
+
+	nonce0 = new BN(nonce0[1], 16).toBuffer(65);
+	nonce1 = new BN(nonce1[1], 16).toBuffer(32);
+	seed = new BN(seed[1], 16).toBuffer(65);
+	counter = new BN(counter[1], 16).toBuffer(1);
+	hmac = new BN(hmac[1], 16).toBuffer(32);
 
 	console.log("nonce0 is:" + nonce0);
 	console.log("nonce1 is:" + nonce1);
 	console.log("seed is:" + seed);
 	console.log("counter is:" + counter);
 	console.log("hmac is:" + hmac);
-
-	console.log("nonce0(len):" + nonce0.length);
-	console.log("nonce1(len):" + nonce1.length);
-	console.log("seed(len):" + seed.length);
-	console.log("counter(len):" + counter.length);
-	console.log("hmac(len):" + hmac.length);
 
 	let respnonce = Buffer.concat([nonce0, nonce1, seed, counter, hmac],
 							 nonce0.length + nonce1.length + seed.length +
