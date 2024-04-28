@@ -16,6 +16,7 @@ import "./seed.sol";
 import "./point.sol";
 import "./randomNumber.sol";
 
+// Nonce structure (https://drive.google.com/file/d/1lza0qvFcVXlVRDdPPlYLRkMz2nAFCdVS/view?usp=sharing)
 struct ChallengeNonce {
 	bytes nonce0; //65
 	bytes nonce1; //32
@@ -26,6 +27,7 @@ struct ChallengeNonce {
 
 library Nonce {
 
+	// New exchange session
 	function session () internal view returns (uint256, uint256, uint256) {
 /*		uint lcs;
 		uint ts;
@@ -37,6 +39,7 @@ library Nonce {
 		return Seed.session();
 	}
 
+	// Solve for Lock's nonce
 	function solve (uint256 _priv, ChallengeNonce calldata nonce)
 					internal pure returns (bool, AffinePoint memory,
 										   AffinePoint memory) {
@@ -44,6 +47,7 @@ library Nonce {
 		return solveNonce(_priv, nonce);
 	}
 
+	// Extracts the public part of the nonce and calles the seed oracle
 	function solveNonce (uint256 _priv, ChallengeNonce calldata nonce) 
 						 internal pure returns (bool, AffinePoint memory,
 						 						AffinePoint memory) {
@@ -57,6 +61,7 @@ library Nonce {
 		return (true, Pm, Pa);
 	}
 
+	// Generated the response challenge to be sent to the Lock
 	function update (uint256 _priv, AffinePoint memory _pb,
 					 AffinePoint memory _pa, AffinePoint memory _pm)
 					 internal view returns (ChallengeNonce memory nonce) {

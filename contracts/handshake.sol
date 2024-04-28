@@ -14,6 +14,7 @@ import "./nonce.sol";
 
 library Handshake {
 
+	// New handshake session
 	function session () internal view returns (uint256 _priv, string memory _type, uint256 _pb_x, uint256 _pb_y) {
 /*		uint start;
 		uint end;
@@ -29,18 +30,21 @@ library Handshake {
 		return (_priv, _type, _pb_x, _pb_y);
 	}
 
+	// Solves for challenge (nonce) sent by the Lock 
 	function solve (uint256 _priv, ChallengeNonce calldata nonce)
 					internal pure returns (bool, AffinePoint memory,
 										   AffinePoint memory) {
 		return Nonce.solve(_priv, nonce);
 	}
 
+	// Send the initial request frame containing the Owner's public key
 	function sendRequest (uint256 _pb_x, uint256 _pb_y) internal pure returns
 						 (string memory _type, uint256, uint256) {
 		_type = "Request";
 		return (_type, _pb_x, _pb_y);
 	}
 
+	// Triggers the generation of the Owner's challenge
 	function update (uint256 _priv, AffinePoint memory _pb,
 					 AffinePoint memory _pa, AffinePoint memory _pm)
 					 internal view returns (ChallengeNonce memory nonce) {

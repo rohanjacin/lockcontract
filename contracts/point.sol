@@ -17,6 +17,7 @@ struct AffinePoint {
 	uint256 y;
 }
 
+// Point on the ECC secp256k1 curve
 library Point {
 
 	uint256 constant GX = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798;
@@ -26,6 +27,7 @@ library Point {
 	uint256 constant PP = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F;
 	uint8 constant len = 32;
 
+	// Decodes the public key from the formated string
 	function decode (bytes calldata key) internal pure returns (bytes32 _x, bytes32 _y) {
 		
 		// uncompressed, hybrid-odd, hybrid-even
@@ -46,6 +48,7 @@ library Point {
 		}
 	}
 
+	// Encodes the public key to the formated string
 	function encode (bytes32 _x, bytes32 _y) internal pure returns (bytes memory key) {
 		bytes memory a = hex"04";
 
@@ -60,6 +63,7 @@ library Point {
 		return key;
 	}
 
+	// Generates an ECC public key from the private scalar (k*G)
 	function genKeyPair (uint256 k) internal pure returns (uint256, uint256, uint256) {
 		uint256 qx;
 		uint256 qy;
@@ -75,6 +79,7 @@ library Point {
 	    return (k, qx, qy);
 	}
 
+	// Decodes and verifies point on curve
 	function createPointFromPublic (bytes calldata key) internal pure returns (AffinePoint memory _P) {		
 		bytes32 _xx;
 		bytes32 _yy;
@@ -88,6 +93,7 @@ library Point {
 		}
 	}
 
+	// Verifies point on curve and encodes it
 	function encodePointFromCipher (AffinePoint memory _P) internal pure returns (bytes memory key) {		
 		bytes32 _xx = bytes32(_P.x);
 		bytes32 _yy = bytes32(_P.y);

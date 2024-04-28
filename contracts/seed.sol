@@ -20,6 +20,7 @@ import "./point.sol";
 
 library Seed {
 
+	// New exchange session
 	function session () internal view returns (uint256, uint256, uint256) {
 /*		uint lcs;
 		uint ts;
@@ -38,6 +39,7 @@ library Seed {
 		return (priv, pub_x, pub_y);
 	}
 
+	// Generates a random epherium pub/priv pair
 	function genRPV () internal view returns (uint256, uint256, uint256) {
 
 		uint256 k = RandomNumber.getNumber();
@@ -46,6 +48,7 @@ library Seed {
 	    return Point.genKeyPair(k);
 	}
 
+	// Retrieves the Lock's secret (Pm) from the seed in the challenge nonce
 	function retrieveSeed (uint256 _priv, AffinePoint memory _Pa, bytes calldata _seed) internal pure returns (AffinePoint memory Pm) {
 		AffinePoint memory CipherPt_2;
 		AffinePoint memory SharedPt;
@@ -81,6 +84,7 @@ library Seed {
 		return Pm;
 	}
 
+	// Generates a seed with the Lock's secret (Pm received and extracted from the challenge)
 	function genSeed (uint256 _priv, AffinePoint memory _Pb,
 					  AffinePoint memory _Pa, AffinePoint memory _Pm)
 					  internal pure returns (bytes memory) {

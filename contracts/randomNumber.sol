@@ -13,6 +13,7 @@ import "hardhat/console.sol";
 
 library RandomNumber {
 
+	// Generates pesudo random number
 	function getNumber () internal view returns (uint) {
 		uint randNo = 0;
 		randNo = uint (keccak256(abi.encodePacked(msg.sender, block.timestamp, randNo)));

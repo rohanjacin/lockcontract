@@ -10,7 +10,6 @@ pragma solidity ^0.8.0;
  *    d. Sends the reponse challenge to the phycical lock (thru the Guest's phone)
  */
 
-//elliptic-curve-solidity/contracts/
 import "./handshake.sol";
 import "hardhat/console.sol";
 
@@ -18,11 +17,16 @@ contract Lock {
 
   string name;
   struct Session {
+    // Owner's private key
     uint256 priv;
+    // Owner's public key
     AffinePoint pb;
     AffinePoint pa;
+    // Lock's secret point
     AffinePoint pm;
+    // Frame type
     string ftype;
+    // Lock's extracted secret match w/ expected secret status
     bool matched;
   }
 
@@ -33,6 +37,7 @@ contract Lock {
     console.log("name:", name);
   } 
 
+  // New handshake session
   function session () public returns (string memory _type, uint256 _Pb_x, uint256 _Pb_y) {
     uint256 _priv;
     Session memory s;
@@ -46,6 +51,7 @@ contract Lock {
     s.ftype = _type;
     sessions[msg.sender] = s;
 
+    // Returns the initial exchange data (the owner's public key)
     return (_type, _Pb_x, _Pb_y);
   }
 
@@ -55,6 +61,8 @@ contract Lock {
     return (sp.ftype, sp.pb.x, sp.pb.y);
   }
 
+  // Solves for the nonce sent from the lock and returns 
+  // true if Lock's extracted secret equals expected secret
   function solve (ChallengeNonce calldata nonce)
                   public returns (bool) {
     Session memory sp = sessions[msg.sender];
@@ -64,6 +72,7 @@ contract Lock {
     (sp.matched, sp.pm, sp.pa) = Handshake.solve(sp.priv, nonce);
     sessions[msg.sender] = sp;
     console.log("s.matched:", sp.matched);
+
     return sp.matched;
   }
 
@@ -75,6 +84,7 @@ contract Lock {
     return (s.matched);
   }
 
+  // Generated Owner's nonce to be sent in return to Lock's challenge
   function update () public view returns (ChallengeNonce memory nonce) {
 
     console.log("Update", msg.sender);    

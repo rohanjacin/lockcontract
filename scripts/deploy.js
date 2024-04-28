@@ -12,6 +12,7 @@ class LockNetwork extends serverHandshake {
 	}
 }
 
+// Connects to the Lock contract
 LockNetwork.prototype.connect = async function () {
 
 	this.Lock = await hre.ethers.getContractFactory('Lock');
@@ -21,6 +22,8 @@ LockNetwork.prototype.connect = async function () {
 	this.session();
 }
 
+// Registers for event from the server handshake framework which
+// communicates with the Lock hanshake protocol
 LockNetwork.prototype.buildContractEventHandler = async function () {
 	this.on('contract_event', function (event, data) {
 
@@ -39,6 +42,7 @@ LockNetwork.prototype.buildContractEventHandler = async function () {
 	}.bind(this));
 }
 
+// Issues a new hanshake session with the lock contract
 LockNetwork.prototype.request = async function () {
 	await this.samplelock.session();
 
@@ -52,6 +56,7 @@ LockNetwork.prototype.request = async function () {
 	}
 }
 
+// Sends the challenge to the lock contract
 LockNetwork.prototype.challenge = async function (nonce) {
 
 	let nonce0 = Uint8Array.from(nonce.data.slice(0, 65));
@@ -71,6 +76,8 @@ LockNetwork.prototype.challenge = async function (nonce) {
 	this.validate(true);
 }
 
+// Receives the Owner's response challenge from the
+// lock contract
 LockNetwork.prototype.response = async function () {
 
 	let nonce0;
